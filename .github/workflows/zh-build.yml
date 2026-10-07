@@ -67,6 +67,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.sync.outputs.sha }}
+          persist-credentials: false   # 此任务不推送,别把 token 留在工作区(容器是第三方镜像)
 
       - name: 编译 hekate 与 Nyx
         run: |
@@ -97,6 +98,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ needs.sync.outputs.sha }}
+          persist-credentials: false   # 发布用 GH_TOKEN,不需要 git 凭据
 
       - uses: actions/download-artifact@v4
         with:
