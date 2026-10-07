@@ -117,41 +117,8 @@ fi
 # ---------------------------------------------------------------- 打包 zip
 if [ "$DO_PACKAGE" = 1 ]; then
 	[ -f output/nyx.bin ] || die "output/nyx.bin 不存在,先加 --build 编译"
-
-	work=$(mktemp -d)
-	trap 'rm -rf "$work"' EXIT
-	info "下载官方 v${BL_VER} 发布包(取除 nyx.bin 之外的文件)"
-	gh release download "v${BL_VER}" --repo "${UPSTREAM}" \
-		--pattern "hekate_ctcaer_${BL_VER}_Nyx_*.zip" --dir "$work" --clobber
-
-	# 解包/打包都用 python3,不依赖 zip/unzip/7z
-	info "解包"
-	python3 - "$work" "$work/pkg" <<-'PY'
-	import glob, os, sys, zipfile
-	work, dst = sys.argv[1], sys.argv[2]
-	os.makedirs(dst, exist_ok=True)
-	with zipfile.ZipFile(glob.glob(os.path.join(work, 'hekate_ctcaer_*.zip'))[0]) as z:
-	    z.extractall(dst)
-	PY
-
-	info "替换 Nyx 为中文版"
-	cp output/nyx.bin "$work/pkg/bootloader/sys/nyx.bin"
-
-	zip_name="hekate_zh_ctcaer_${BL_VER}_Nyx_${NYX_VER}.zip"
-	rm -f output/"$zip_name"
-	python3 - "$work/pkg" "output/${zip_name}" <<-'PY'
-	import os, sys, zipfile
-	src, dst = sys.argv[1], sys.argv[2]
-	with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as z:
-	    for root, dirs, files in os.walk(src):
-	        for d in sorted(dirs):          # 保留官方包里的空目录(ini/、payloads/ 等)
-	            full = os.path.join(root, d)
-	            z.write(full, os.path.relpath(full, src) + '/')
-	        for f in sorted(files):
-	            full = os.path.join(root, f)
-	            z.write(full, os.path.relpath(full, src))
-	PY
-	info "已生成:output/${zip_name} ($(wc -c <output/"$zip_name") 字节)"
+	# 打包逻辑与 CI 共用 tools/package_release.sh
+	bash tools/package_release.sh --nyx output/nyx.bin
 	info "刷写方式:解压后覆盖 SD 卡;最少只需替换 bootloader/sys/nyx.bin"
 fi
 

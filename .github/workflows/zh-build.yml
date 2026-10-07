@@ -1,0 +1,177 @@
+name: 中文版自动构建
+
+# 触发方式:
+#   1. 定时(每天 11:00 北京时间):拉取上游最新版本 → 有更新就编译并发布
+#   2. 手动(workflow_dispatch):可指定上游引用、Release tag、强制重新发布
+#   3. 打 tag(zh-*):直接构建该 tag 并发布
+#
+# 上游合并冲突时会自动开 issue 提醒,不会强行覆盖汉化改动。
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      upstream_ref:
+        description: '要合并的上游引用(留空 = 最新 v* 标签,可填 master)'
+        required: false
+        default: ''
+      tag:
+        description: 'Release tag(留空 = 自动生成 zh-v<版本>[-n])'
+        required: false
+        default: ''
+      force:
+        description: '即使没有更新也强制重新构建并发布'
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'zh-*'
+
+concurrency:
+  group: zh-build
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  sync:
+    name: 同步上游
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.sync.outputs.changed }}
+      sha: ${{ steps.sync.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 拉取并合并上游
+        id: sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_REF: ${{ inputs.upstream_ref }}
+          FORCE: ${{ inputs.force }}
+          SKIP_MERGE: ${{ github.event_name == 'push' }}
+        run: bash tools/ci_sync_upstream.sh
+
+  build:
+    name: 编译
+    needs: sync
+    if: needs.sync.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitarm:latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.sync.outputs.sha }}
+
+      - name: 编译 hekate 与 Nyx
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          make clean
+          make -j"$(nproc)"
+          ls -l output/*.bin
+          size=$(wc -c < output/hekate.bin)
+          echo "hekate payload: ${size} 字节"
+          if [ "$size" -gt 126296 ]; then
+            echo "::error::hekate 负载超限(${size} > 126296)"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nyx-bin
+          path: output/nyx.bin
+          if-no-files-found: error
+
+  release:
+    name: 打包并发布
+    needs: [sync, build]
+    if: needs.sync.outputs.changed == 'true' && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.sync.outputs.sha }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: nyx-bin
+          path: output
+
+      - name: 打包(官方发布包 + 中文 nyx.bin)
+        run: bash tools/package_release.sh --nyx output/nyx.bin
+
+      - name: 生成 tag
+        id: tag
+        env:
+          IN_TAG: ${{ inputs.tag }}
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          ver() { sed -n "s/^$1 *:= *\([0-9]*\)/\1/p;" Versions.inc | head -1; }
+          bl="$(ver BLVERSION_MAJOR).$(ver BLVERSION_MINOR).$(ver BLVERSION_HOTFX)"
+
+          if [ -n "$IN_TAG" ]; then
+            tag="$IN_TAG"
+          elif [ "$EVENT" = "push" ]; then
+            tag="$REF_NAME"
+          else
+            tag="zh-v${bl}"; n=1
+            while git ls-remote --tags origin "refs/tags/${tag}" | grep -q .; do
+              n=$((n+1)); tag="zh-v${bl}-${n}"
+            done
+          fi
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "bl=${bl}" >> "$GITHUB_OUTPUT"
+          echo "发布 tag:${tag}"
+
+      - name: 创建 Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ needs.sync.outputs.sha }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          BL: ${{ steps.tag.outputs.bl }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          zip=$(ls output/hekate_zh_ctcaer_*.zip | head -1)
+          nyx_size=$(wc -c < output/nyx.bin)
+          nyx_sha=$(sha256sum output/nyx.bin | cut -c1-16)
+          zip_sha=$(sha256sum "$zip" | cut -c1-16)
+          short=$(git rev-parse --short=8 HEAD)
+
+          notes=$(cat <<EOF
+          基于 [CTCaer/hekate](https://github.com/CTCaer/hekate) v${BL} 的中文版(Nyx 界面全中文)。
+          上游提交:\`$(git rev-parse --short=8 "$SHA")\` @ $(date -u +%F)
+
+          ## 下载
+          - \`$(basename "$zip")\` — 完整刷写包(解压后覆盖 SD 卡)
+          - \`nyx.bin\` — 只需要中文界面的话,替换 \`bootloader/sys/nyx.bin\` 即可,其它文件保持官方版
+
+          | 文件 | 大小 | sha256(前 16 位) |
+          | --- | --- | --- |
+          | nyx.bin | ${nyx_size} 字节 | \`${nyx_sha}\` |
+          | $(basename "$zip") | $(wc -c < "$zip") 字节 | \`${zip_sha}\` |
+
+          ## 说明
+          - 中文字体(HarmonyOS Sans + 全角标点)与译文来自 [easyworld/hekate](https://github.com/easyworld/hekate) 的汉化
+          - hekate 自身的文字菜单仍为英文(内置 8x8 点阵字库 + 126KB 体积上限)
+          - 字体为子集字库;自定义中文启动项名如遇生僻字显示空白,可用 \`tools/gen_lvgl6_glyphs.py\` 补充字形
+          EOF
+          )
+
+          if [ "$EVENT" = "push" ]; then
+            gh release create "$TAG" "$zip" output/nyx.bin --verify-tag \
+              --title "hekate 中文版 v${BL} (${TAG})" --notes "$notes"
+          else
+            gh release create "$TAG" "$zip" output/nyx.bin --target "$SHA" \
+              --title "hekate 中文版 v${BL} (${TAG})" --notes "$notes" \
+            || { gh release upload "$TAG" "$zip" output/nyx.bin --clobber; \
+                 gh release edit "$TAG" --notes "$notes"; }
+          fi
