@@ -93,6 +93,8 @@ python3 - "$work" "$work/pkg" "$NYX_BIN" "$repo_root/$OUT" <<-'PY'
 	PY
 
 sha=$(sha256sum "$OUT" | cut -d' ' -f1)
-info "已生成:$OUT ($(wc -c <"$OUT") 字节)"
+info "已生成:${OUT} ($(wc -c <"$OUT") 字节)"
 info "sha256:${sha}"
-[ "$VERBOSE" = 1 ] && python3 -c "import zipfile,sys; print('\n'.join(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))" "$OUT"
+if [ "$VERBOSE" = 1 ]; then
+	python3 -c "import sys,zipfile; print('\n'.join(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))" "$OUT"
+fi
