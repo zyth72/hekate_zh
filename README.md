@@ -1,3 +1,41 @@
+# hekate 中文版(Nyx 界面全中文)
+
+基于 [CTCaer/hekate](https://github.com/CTCaer/hekate) 的汉化分支:**Nyx 图形界面全中文**,加载逻辑、引导流程与官方完全一致。
+
+## 下载与安装
+
+到 [Releases](https://github.com/zyth72/hekate_zh/releases/latest) 下载:
+
+| 文件 | 用法 |
+| --- | --- |
+| `hekate_zh_ctcaer_x.y.z_Nyx_x.y.z.zip` | 完整刷写包:解压后覆盖 SD 卡根目录(包内附带 `payload.bin`) |
+| `nyx.bin` | 只想换中文界面:替换 `bootloader/sys/nyx.bin`,其它文件保持官方版不动 |
+| `payload.bin` | RCM 注入器 / 烧录器用的 hekate 负载(与 `hekate_ctcaer_x.y.z.bin` 相同) |
+
+## 说明
+
+- 中文字体(HarmonyOS Sans,含全角标点)与译文来自 [easyworld/hekate](https://github.com/easyworld/hekate) 的汉化(GPL-2),已跟进到上游最新发布版
+- hekate 自身的文字菜单(Launch / Tools / Console info 那一层)仍是英文:它用的是内置 8x8 点阵字库,而且 hekate.bin 有 126KB 体积上限,放不下中文字库
+- 字体是子集字库(732 个字形,覆盖界面里的全部中文)。`hekate_ipl.ini` 自定义的中文启动项名如果出现生僻字会显示空白,可用 `tools/gen_lvgl6_glyphs.py` 追加字形
+- 上游发新版后,本仓库会自动合并 → 编译 → 发布(见 `.github/workflows/zh-build.yml`);若汉化与上游改动冲突,会自动开 issue 提醒手动合并,不会覆盖汉化
+
+## 从源码构建
+
+```bash
+export DEVKITARM=/opt/devkitpro/devkitARM   # devkitPro 的 devkitARM 路径
+make                                        # 产物:output/nyx.bin(中文界面)、output/hekate.bin
+tools/package_release.sh                    # 与官方发布包合成可刷写 zip
+```
+
+## 致谢
+
+- [CTCaer/hekate](https://github.com/CTCaer/hekate) — 原项目
+- [easyworld/hekate](https://github.com/easyworld/hekate) — 中文字体与译文
+
+---
+
+## 官方 README(English)
+
 # hekate - Nyx
 
 ![Image of Hekate](https://user-images.githubusercontent.com/3665130/60391760-bc1e8c00-9afe-11e9-8b7a-b065873081b2.png)

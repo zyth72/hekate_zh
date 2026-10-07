@@ -143,6 +143,7 @@ jobs:
         run: |
           set -euo pipefail
           zip=$(ls output/hekate_zh_ctcaer_*.zip | head -1)
+          assets=("$zip" output/nyx.bin output/payload.bin)
           nyx_size=$(wc -c < output/nyx.bin)
           nyx_sha=$(sha256sum output/nyx.bin | cut -c1-16)
           zip_sha=$(sha256sum "$zip" | cut -c1-16)
@@ -153,8 +154,9 @@ jobs:
           上游提交:\`$(git rev-parse --short=8 "$SHA")\` @ $(date -u +%F)
 
           ## 下载
-          - \`$(basename "$zip")\` — 完整刷写包(解压后覆盖 SD 卡)
+          - \`$(basename "$zip")\` — 完整刷写包(解压后覆盖 SD 卡;包内已附带 \`payload.bin\`)
           - \`nyx.bin\` — 只需要中文界面的话,替换 \`bootloader/sys/nyx.bin\` 即可,其它文件保持官方版
+          - \`payload.bin\` — RCM 注入器/烧录器用的 hekate 负载(内容同 \`hekate_ctcaer_${BL}.bin\`)
 
           | 文件 | 大小 | sha256(前 16 位) |
           | --- | --- | --- |
@@ -169,11 +171,11 @@ jobs:
           )
 
           if [ "$EVENT" = "push" ]; then
-            gh release create "$TAG" "$zip" output/nyx.bin --verify-tag \
+            gh release create "$TAG" "${assets[@]}" --verify-tag \
               --title "hekate 中文版 v${BL} (${TAG})" --notes "$notes"
           else
-            gh release create "$TAG" "$zip" output/nyx.bin --target "$SHA" \
+            gh release create "$TAG" "${assets[@]}" --target "$SHA" \
               --title "hekate 中文版 v${BL} (${TAG})" --notes "$notes" \
-            || { gh release upload "$TAG" "$zip" output/nyx.bin --clobber; \
+            || { gh release upload "$TAG" "${assets[@]}" --clobber; \
                  gh release edit "$TAG" --notes "$notes"; }
           fi

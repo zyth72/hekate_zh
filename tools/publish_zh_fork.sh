@@ -20,7 +20,7 @@
 set -euo pipefail
 
 UPSTREAM="${UPSTREAM:-CTCaer/hekate}"
-FORK_NAME="${FORK_NAME:-hekate}"
+FORK_NAME="${FORK_NAME:-hekate_zh}"
 BRANCH="${BRANCH:-master}"
 COMMIT_MSG="${COMMIT_MSG:-zh-cn: Nyx 中文界面(UTF-8 + HarmonyOS Sans 中文字体 + 全角标点字形)}"
 
@@ -126,8 +126,9 @@ fi
 if [ -n "$RELEASE_TAG" ]; then
 	zip_path=$(ls -t output/hekate_zh_ctcaer_*_Nyx_*.zip 2>/dev/null | head -1 || true)
 	[ -n "$zip_path" ] || die "找不到 zip,先用 --package 打包"
+	[ -f output/payload.bin ] || die "找不到 output/payload.bin,先用 --package 生成"
 	info "创建 GitHub Release:${RELEASE_TAG}"
-	gh release create "$RELEASE_TAG" "$zip_path" \
+	gh release create "$RELEASE_TAG" "$zip_path" output/nyx.bin output/payload.bin \
 		--repo "${FORK}" \
 		--title "hekate 中文版 ${RELEASE_TAG}" \
 		--notes "基于 CTCaer/hekate v${BL_VER} + Nyx ${NYX_VER} 的中文版。
