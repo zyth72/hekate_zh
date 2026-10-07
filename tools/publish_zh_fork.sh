@@ -126,9 +126,8 @@ fi
 if [ -n "$RELEASE_TAG" ]; then
 	zip_path=$(ls -t output/hekate_zh_ctcaer_*_Nyx_*.zip 2>/dev/null | head -1 || true)
 	[ -n "$zip_path" ] || die "找不到 zip,先用 --package 打包"
-	[ -f output/payload.bin ] || die "找不到 output/payload.bin,先用 --package 生成"
 	info "创建 GitHub Release:${RELEASE_TAG}"
-	gh release create "$RELEASE_TAG" "$zip_path" output/nyx.bin output/payload.bin \
+	gh release create "$RELEASE_TAG" "$zip_path" output/nyx.bin \
 		--repo "${FORK}" \
 		--title "hekate 中文版 ${RELEASE_TAG}" \
 		--notes "基于 CTCaer/hekate v${BL_VER} + Nyx ${NYX_VER} 的中文版。

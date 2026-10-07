@@ -8,9 +8,8 @@
 
 | 文件 | 用法 |
 | --- | --- |
-| `hekate_zh_ctcaer_x.y.z_Nyx_x.y.z.zip` | 完整刷写包:解压后覆盖 SD 卡根目录(包内附带 `payload.bin`) |
+| `hekate_zh_ctcaer_x.y.z_Nyx_x.y.z.zip` | 完整刷写包:解压后覆盖 SD 卡根目录(根目录的 `payload.bin` 就是 hekate 负载,可直接给注入器/烧录器用) |
 | `nyx.bin` | 只想换中文界面:替换 `bootloader/sys/nyx.bin`,其它文件保持官方版不动 |
-| `payload.bin` | RCM 注入器 / 烧录器用的 hekate 负载(与 `hekate_ctcaer_x.y.z.bin` 相同) |
 
 ## 说明
 

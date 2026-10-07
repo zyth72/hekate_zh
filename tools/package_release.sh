@@ -4,7 +4,7 @@
 #
 #   1. 从 CTCaer/hekate 的 GitHub Release 下载当前版本的官方 zip
 #   2. 用中文版 nyx.bin 替换其中的 bootloader/sys/nyx.bin
-#   3. 额外放一份 payload.bin(RCM 注入器/烧录器惯用名,内容同 hekate_ctcaer_<版本>.bin)
+#   3. 官方 payload 改名为 payload.bin(RCM 注入器/烧录器惯用名,内容不变,不重复放两份)
 #   4. 重新打包成 output/hekate_zh_ctcaer_<hekate 版本>_Nyx_<Nyx 版本>.zip
 #
 # 只替换 nyx.bin:hekate 自身、res.pak、模块等都保持官方版本不变。
@@ -83,12 +83,10 @@ python3 - "$work" "$work/pkg" "$NYX_BIN" "$repo_root/$OUT" <<-'PY'
 	with open(nyx_bin, 'rb') as src, open(target, 'wb') as fp:
 	    fp.write(src.read())
 
-	# 官方 payload 再放一份为 payload.bin(RCM 注入器、烧录器惯用的文件名),
-	# 原文件名保留,老教程/脚本还能照旧用。
-	payload = glob.glob(os.path.join(dst, 'hekate_ctcaer_*.bin'))
-	if payload:
-	    shutil.copyfile(payload[0], os.path.join(dst, 'payload.bin'))
-	    shutil.copyfile(payload[0], os.path.join(os.path.dirname(os.path.abspath(out)), 'payload.bin'))
+	# 官方 payload 改名为 payload.bin(RCM 注入器、烧录器惯用的文件名),
+	# 内容不变、也不保留两份同样的文件。
+	for payload in glob.glob(os.path.join(dst, 'hekate_ctcaer_*.bin')):
+	    os.replace(payload, os.path.join(dst, 'payload.bin'))
 
 	with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
 	    for root, dirs, files in os.walk(dst):
@@ -102,7 +100,6 @@ python3 - "$work" "$work/pkg" "$NYX_BIN" "$repo_root/$OUT" <<-'PY'
 
 sha=$(sha256sum "$OUT" | cut -d' ' -f1)
 info "已生成:${OUT} ($(wc -c <"$OUT") 字节)"
-info "已生成:$(dirname "$OUT")/payload.bin ($(wc -c <"$(dirname "$OUT")/payload.bin") 字节)"
 info "sha256:${sha}"
 if [ "$VERBOSE" = 1 ]; then
 	python3 -c "import sys,zipfile; print('\n'.join(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))" "$OUT"
