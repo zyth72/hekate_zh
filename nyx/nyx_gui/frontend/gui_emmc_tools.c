@@ -50,7 +50,7 @@ static void _create_window_backup_restore(emmcPartType_t type, const char* win_l
 
 	char win_label_full[80];
 
-	s_printf(win_label_full, "%s%s", emmc_btn_ctxt.restore ? SYMBOL_DOWNLOAD"  Restore " : SYMBOL_UPLOAD"  Backup ", win_label+3);
+	s_printf(win_label_full, "%s%s", emmc_btn_ctxt.restore ? SYMBOL_DOWNLOAD"  恢复 " : SYMBOL_UPLOAD"  备份 ", win_label+3);
 
 	lv_obj_t *win = nyx_create_standard_window(win_label_full, NULL);
 
@@ -248,15 +248,15 @@ static lv_res_t _emmc_backup_buttons_raw_toggle(lv_obj_t *btn)
 	else // Backup/Restore from and to emuMMC.
 	{
 		if (!emmc_btn_ctxt.restore)
-			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_boot, NULL), SYMBOL_UPLOAD"  SD emuMMC BOOT0 & BOOT1");
+			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_boot, NULL), SYMBOL_UPLOAD"  SD虚拟系统 BOOT0 & BOOT1");
 		else
-			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_boot, NULL), SYMBOL_DOWNLOAD"  SD emuMMC BOOT0 & BOOT1");
+			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_boot, NULL), SYMBOL_DOWNLOAD"  SD虚拟系统 BOOT0 & BOOT1");
 		lv_obj_realign(emmc_btn_ctxt.emmc_boot);
 
 		if (!emmc_btn_ctxt.restore)
-			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_raw_gpp, NULL), SYMBOL_UPLOAD"  SD emuMMC RAW GPP");
+			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_raw_gpp, NULL), SYMBOL_UPLOAD"  SD虚拟系统 RAW GPP");
 		else
-			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_raw_gpp, NULL), SYMBOL_DOWNLOAD"  SD emuMMC RAW GPP");
+			lv_label_set_static_text(lv_obj_get_child(emmc_btn_ctxt.emmc_raw_gpp, NULL), SYMBOL_DOWNLOAD"  SD虚拟系统 RAW GPP");
 		lv_obj_realign(emmc_btn_ctxt.emmc_raw_gpp);
 
 		lv_obj_set_click(emmc_btn_ctxt.emmc_sys, false);
@@ -279,13 +279,13 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	lv_obj_t *win;
 
 	emmc_btn_ctxt.restore = false;
-	if (strcmp(lv_label_get_text(lv_obj_get_child(btn, NULL)), SYMBOL_UPLOAD"  Backup eMMC"))
+	if (strcmp(lv_label_get_text(lv_obj_get_child(btn, NULL)), SYMBOL_UPLOAD"  备份eMMC"))
 		emmc_btn_ctxt.restore = true;
 
 	if (!emmc_btn_ctxt.restore)
-		win = nyx_create_standard_window(SYMBOL_SD" Backup", NULL);
+		win = nyx_create_standard_window(SYMBOL_SD" 备份", NULL);
 	else
-		win = nyx_create_standard_window(SYMBOL_SD" Restore", NULL);
+		win = nyx_create_standard_window(SYMBOL_SD" 恢复", NULL);
 
 	static lv_style_t h_style;
 	lv_style_copy(&h_style, &lv_style_transp);
@@ -305,7 +305,7 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	lv_label_set_static_text(label_sep, "");
 
 	lv_obj_t *label_txt = lv_label_create(h1, NULL);
-	lv_label_set_static_text(label_txt, "Full");
+	lv_label_set_static_text(label_txt, "全部");
 	lv_obj_set_style(label_txt, lv_theme_get_current()->label.prim);
 	lv_obj_align(label_txt, label_sep, LV_ALIGN_OUT_BOTTOM_LEFT, LV_DPI / 4, -LV_DPI * 3 / 10);
 
@@ -333,16 +333,16 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	if (!emmc_btn_ctxt.restore)
 	{
 		lv_label_set_static_text(label_txt2,
-			"Allows you to backup the BOOT physical partitions.\n"
-			"They contain the BCT, keys and various package1.\n"
-			"#FF8000 These are paired with the RAW GPP backup.#");
+			"备份BOOT物理分区.\n"
+			"包含BCT, 密钥及package1等数据.\n"
+			"#FF8000 与下面的RAW GPP备份相对应.#");
 	}
 	else
 	{
 		lv_label_set_static_text(label_txt2,
-			"Allows you to restore the BOOT physical partitions.\n"
-			"They contain the BCT, keys and various package1.\n"
-			"#FF8000 These are paired with the RAW GPP restore.#");
+			"恢复BOOT物理分区.\n"
+			"包含BCT, 密钥及package1等数据.\n"
+			"#FF8000 与下面的RAW GPP恢复相对应.#");
 	}
 	lv_obj_set_style(label_txt2, &hint_small_style);
 	lv_obj_align(label_txt2, btn1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, LV_DPI / 3);
@@ -363,16 +363,16 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	if (!emmc_btn_ctxt.restore)
 	{
 		lv_label_set_static_text(label_txt2,
-			"Allows you to backup the GPP physical partition.\n"
-			"It contains, CAL0, various package2, SYSTEM, USER, etc.\n"
-			"#FF8000 This is paired with the BOOT0/1 backups.#");
+			"备份GPP物理分区.\n"
+			"包含CAL0, package2, SYSTEM, USER等.\n"
+			"#FF8000 与上面的BOOT0/1备份相对应.#");
 	}
 	else
 	{
 		lv_label_set_static_text(label_txt2,
-			"Allows you to restore the GPP physical partition.\n"
-			"It contains, CAL0, various package2, SYSTEM, USER, etc.\n"
-			"#FF8000 This is paired with the BOOT0/1 restore.#");
+			"恢复GPP物理分区.\n"
+			"包含CAL0, package2, SYSTEM, USER等.\n"
+			"#FF8000 与上面的BOOT0/1恢复相对应.#");
 	}
 	lv_obj_set_style(label_txt2, &hint_small_style);
 	lv_obj_align(label_txt2, btn2, LV_ALIGN_OUT_BOTTOM_LEFT, 0, LV_DPI / 3);
@@ -390,7 +390,7 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	lv_label_set_static_text(label_sep, "");
 
 	lv_obj_t *label_txt3 = lv_label_create(h2, NULL);
-	lv_label_set_static_text(label_txt3, "GPP Partitions");
+	lv_label_set_static_text(label_txt3, "GPP分区");
 	lv_obj_set_style(label_txt3, lv_theme_get_current()->label.prim);
 	lv_obj_align(label_txt3, label_sep, LV_ALIGN_OUT_BOTTOM_LEFT, LV_DPI / 4, -LV_DPI * 4 / 21);
 
@@ -414,15 +414,15 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 	if (!emmc_btn_ctxt.restore)
 	{
 		lv_label_set_static_text(label_txt4,
-			"Allows you to backup the partitions from RAW GPP except\n"
-			"USER. It contains, CAL0, various package2, SYSTEM, etc.\n"
-			"#FF8000 This is an incomplete backup.#");
+			"备份RAW GPP中除USER以外的分区.\n"
+			"包含CAL0, package2, SYSTEM等.\n"
+			"#FF8000 此备份非完整备份.#");
 	}
 	else
 	{
 		lv_label_set_static_text(label_txt4,
-			"Allows you to restore ALL partitions from RAW GPP\n"
-			"It contains, CAL0, various package2, SYSTEM, USER, etc.\n");
+			"从RAW GPP备份中恢复所有分区.\n"
+			"包含CAL0, 各种package2, SYSTEM, USER等.\n");
 	}
 
 	lv_obj_set_style(label_txt4, &hint_small_style);
@@ -441,8 +441,8 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 		label_txt4 = lv_label_create(h2, NULL);
 		lv_label_set_recolor(label_txt4, true);
 		lv_label_set_static_text(label_txt4,
-			"Allows you to backup the USER partition from RAW GPP.\n"
-			"#FF8000 This is an incomplete backup.#\n");
+			"从RAW GPP备份USER分区.\n"
+			"#FF8000 此备份非完整备份.#\n");
 		lv_obj_set_style(label_txt4, &hint_small_style);
 		lv_obj_align(label_txt4, btn4, LV_ALIGN_OUT_BOTTOM_LEFT, 0, LV_DPI / 3);
 	}
@@ -462,7 +462,7 @@ lv_res_t create_window_backup_restore_tool(lv_obj_t *btn)
 
 	lv_obj_t *sd_emummc_raw = lv_btn_create(h3, NULL);
 	nyx_create_onoff_button(lv_theme_get_current(), h3,
-		sd_emummc_raw, SYMBOL_SD" SD emuMMC Raw Partition", _emmc_backup_buttons_raw_toggle, false);
+		sd_emummc_raw, SYMBOL_SD" SD虚拟系统 RAW分区", _emmc_backup_buttons_raw_toggle, false);
 	emmc_btn_ctxt.raw_emummc = false;
 
 	return LV_RES_OK;
