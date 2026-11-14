@@ -1713,14 +1713,14 @@ void create_tab_options(lv_theme_t *th, lv_obj_t *parent)
 	lv_label_set_recolor(label_btn, true);
 	lv_btn_set_fit(btn, true, true);
 	lv_btn_set_toggle(btn, true);
-	lv_label_set_static_text(label_btn, SYMBOL_GPS" 自动启动 #00FFC9   ON #");
+	lv_label_set_static_text(label_btn, SYMBOL_GPS" 自动启动 #00FFC9  开 #");
 	lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, _autoboot_hide_delay_action);
 	lv_obj_align(btn, label_sep, LV_ALIGN_OUT_BOTTOM_LEFT, LV_DPI / 4, -LV_DPI / 10 - 8);
 	lv_btn_set_fit(btn, false, false);
 	autoboot_btn = btn;
 
 	lv_obj_t *label_txt2 = lv_label_create(sw_h2, NULL);
-	lv_label_set_static_text(label_txt2, "选择注入时自动启动的\n启动项或payload.");
+	lv_label_set_static_text(label_txt2, "选择注入时自动启动的\n启动项或载荷.");
 	lv_obj_set_style(label_txt2, &hint_small_style);
 	lv_obj_align(label_txt2, btn, LV_ALIGN_OUT_BOTTOM_LEFT, 0, LV_DPI / 3 - 4);
 
@@ -1796,7 +1796,7 @@ void create_tab_options(lv_theme_t *th, lv_obj_t *parent)
 	label_txt2 = lv_label_create(sw_h3, NULL);
 	lv_label_set_static_text(label_txt2,
 		"在官方系统中选择关机后, 主机将在15秒后自动开机.\n"
-		"此选项启用后, 下一次注入payload时\n会自动关机.");
+		"此选项启用后, 下一次注入载荷时\n会自动关机.");
 	lv_obj_set_style(label_txt2, &hint_small_style);
 	lv_obj_align(label_txt2, btn3, LV_ALIGN_OUT_BOTTOM_LEFT, LV_DPI / 4, LV_DPI / 12);
 

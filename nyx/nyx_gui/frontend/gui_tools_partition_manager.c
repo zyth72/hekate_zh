@@ -2978,7 +2978,7 @@ lv_res_t create_window_partition_manager(bool emmc)
 	if (!emmc)
 	{
 		win = nyx_create_standard_window(SYMBOL_SD" SD分区管理", NULL);
-		lv_win_add_btn(win, NULL, SYMBOL_MODULES_ALT" 修复Hybrid MBR/GPT", _action_fix_mbr_gpt);
+		lv_win_add_btn(win, NULL, SYMBOL_MODULES_ALT" 修复混合MBR/GPT", _action_fix_mbr_gpt);
 	}
 	else
 		win = nyx_create_standard_window(SYMBOL_CHIP" eMMC分区管理", NULL);

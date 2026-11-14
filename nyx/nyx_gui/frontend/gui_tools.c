@@ -1216,7 +1216,7 @@ static lv_res_t _create_window_dump_pk12_tool(lv_obj_t *btn)
 
 		const pkg1_id_t *pkg1_id = pkg1_identify(pkg1 + pk1_offset, build_date);
 
-		s_printf(txt_buf, "#00DDFF 检测到%s pkg1 ('%s')#\n\n", !idx ? "Main" : "Safe", build_date);
+		s_printf(txt_buf, "#00DDFF 检测到%s pkg1 ('%s')#\n\n", !idx ? "主分区" : "安全模式", build_date);
 		lv_label_set_text(lb_log, txt_buf);
 		manual_system_maintenance(true);
 		free(build_date);
@@ -1715,7 +1715,7 @@ static void _create_tab_tools_arc_rcm_pkg12(lv_theme_t *th, lv_obj_t *parent)
 	label_btn = lv_label_create(btn3, NULL);
 	lv_btn_set_fit(btn3, true, true);
 	lv_label_set_recolor(label_btn, true);
-	lv_label_set_text(label_btn, SYMBOL_REFRESH"  AutoRCM #00FFC9   ON #");
+	lv_label_set_text(label_btn, SYMBOL_REFRESH"  AutoRCM #00FFC9  开 #");
 	lv_obj_align(btn3, line_sep, LV_ALIGN_OUT_BOTTOM_LEFT, LV_DPI / 4, LV_DPI / 4);
 	lv_btn_set_action(btn3, LV_BTN_ACTION_CLICK, _create_mbox_autorcm_status);
 

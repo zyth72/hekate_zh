@@ -2192,7 +2192,7 @@ static lv_res_t _create_window_emmc_info_status(lv_obj_t *btn)
 	u32 life_a = emmc_storage.ext_csd.dev_life_est_a;
 	u32 life_b = emmc_storage.ext_csd.dev_life_est_b;
 	u16 card_type = emmc_storage.ext_csd.card_type;
-	char *max_bus_support = "Unknown";
+	char *max_bus_support = "未知";
 
 	// Identify manufacturer. Only official eMMCs.
 	switch (emmc_storage.cid.manfid)

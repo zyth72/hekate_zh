@@ -750,22 +750,22 @@ lv_res_t nyx_generic_onoff_toggle(lv_obj_t *btn)
 
 		if (!(lv_btn_get_state(btn) & LV_BTN_STATE_TGL_REL))
 		{
-			strcat(label_text, "#D0D0D0    OFF#");
+			strcat(label_text, "#D0D0D0    关#");
 			lv_label_set_text(label_btn, label_text);
 		}
 		else
 		{
-			s_printf(label_text, "%s%s%s", label_text, text_color, "    ON #");
+			s_printf(label_text, "%s%s%s", label_text, text_color, "   开 #");
 			lv_label_set_text(label_btn, label_text);
 		}
 	}
 	else
 	{
 		if (!(lv_btn_get_state(btn) & LV_BTN_STATE_TGL_REL))
-			lv_label_set_text(label_btn, "#D0D0D0 OFF#");
+			lv_label_set_text(label_btn, "#D0D0D0    关#");
 		else
 		{
-			s_printf(label_text, "%s%s", text_color, " ON #");
+			s_printf(label_text, "%s%s", text_color, "   开 #");
 			lv_label_set_text(label_btn, label_text);
 		}
 	}
@@ -1236,7 +1236,7 @@ void nyx_create_onoff_button(lv_theme_t *th, lv_obj_t *parent, lv_obj_t *btn, co
 
 	lv_label_set_text(label_btn, btn_name);
 
-	lv_label_set_text(label_btnsw, "#D0D0D0 OFF#");
+	lv_label_set_text(label_btnsw, "#D0D0D0    关#");
 	lv_obj_align(label_btn, btn, LV_ALIGN_IN_LEFT_MID, LV_DPI / 4, 0);
 	lv_obj_align(label_btnsw, btn, LV_ALIGN_IN_RIGHT_MID, -LV_DPI / 4, -LV_DPI / 10);
 
@@ -1297,25 +1297,25 @@ static void _create_tab_about(lv_theme_t * th, lv_obj_t * parent)
 		"\n"
 		"#C7EA46 Nyx#    (c) 2019-2026, #C7EA46 CTCaer#\n"
 		"\n"
-		"Thanks to: #00CCFF derrek, nedwill, plutoo, #\n"
-		"           #00CCFF shuffle2, smea, thexyz, yellows8 #\n"
+		"致谢: #00CCFF derrek, nedwill, plutoo, #\n"
+		"      #00CCFF shuffle2, smea, thexyz, yellows8 #\n"
 		"\n"
-		"Greetings to: fincs, hexkyz, SciresM,\n"
-		"              Shiny Quagsire, WinterMute\n"
+		"致意: fincs, hexkyz, SciresM,\n"
+		"      Shiny Quagsire, WinterMute\n"
 		"\n"
-		"Open source and free packages used:                    \n" // Label width alignment padding.
+		"使用的开源免费组件:                                    \n" // 等宽补齐,保持与右侧章鱼图的间距.
 		" - Littlev Graphics Library,\n"
-		"   Copyright (c) 2016-2018, Gabor Kiss-Vamosi\n\n"
+		"   版权 (c) 2016-2018, Gabor Kiss-Vamosi\n\n"
 		" - FatFs R0.13c,\n"
-		"   Copyright (c) 2006-2018, ChaN\n"
-		"   Copyright (c) 2018-2022, CTCaer\n\n"
+		"   版权 (c) 2006-2018, ChaN\n"
+		"   版权 (c) 2018-2022, CTCaer\n\n"
 		" - bcl-1.2.0,\n"
-		"   Copyright (c) 2003-2006, Marcus Geelnard\n\n"
+		"   版权 (c) 2003-2006, Marcus Geelnard\n\n"
 		" - blz,\n"
-		"   Copyright (c) 2018, SciresM\n\n"
+		"   版权 (c) 2018, SciresM\n\n"
 		" - elfload,\n"
-		"   Copyright (c) 2014, Owen Shepherd\n"
-		"   Copyright (c) 2018, M4xw"
+		"   版权 (c) 2014, Owen Shepherd\n"
+		"   版权 (c) 2018, M4xw"
 	);
 
 	lv_obj_t * lbl_octopus = lv_label_create(parent, NULL);
@@ -1439,7 +1439,7 @@ static lv_res_t _create_mbox_payloads(lv_obj_t *btn)
 	lv_mbox_set_recolor_text(mbox, true);
 	lv_obj_set_width(mbox, LV_HOR_RES * 5 / 9);
 
-	lv_mbox_set_text(mbox, "选择要启动的payload:");
+	lv_mbox_set_text(mbox, "选择要启动的载荷:");
 
 	// Create a list with all found payloads.
 	//! TODO: SHould that be tabs with buttons? + Icon support?
@@ -1595,12 +1595,12 @@ static lv_res_t logs_onoff_toggle(lv_obj_t *btn)
 
 	if (!launch_logs_enable)
 	{
-		strcat(label_text, "#D0D0D0 OFF#");
+		strcat(label_text, "#D0D0D0 关#");
 		lv_label_set_text(label_btn, label_text);
 	}
 	else
 	{
-		s_printf(label_text, "%s%s%s", label_text, text_color, " ON #");
+		s_printf(label_text, "%s%s%s", label_text, text_color, " 开#");
 		lv_label_set_text(label_btn, label_text);
 	}
 
@@ -1700,7 +1700,7 @@ static lv_res_t _create_window_home_launch(lv_obj_t *btn)
 	else
 		win = create_window_launch(SYMBOL_GPS" 其他配置");
 
-	lv_win_add_btn(win, NULL, SYMBOL_LIST" 日志 #D0D0D0 OFF#", logs_onoff_toggle);
+	lv_win_add_btn(win, NULL, SYMBOL_LIST" 日志 #D0D0D0 关#", logs_onoff_toggle);
 	launch_logs_enable = false;
 
 	lv_cont_set_fit(lv_page_get_scrl(lv_win_get_content(win)), false, false);
@@ -2090,7 +2090,7 @@ static void _create_tab_home(lv_theme_t *th, lv_obj_t *parent)
 	lv_btn_set_layout(btn_payloads, LV_LAYOUT_OFF);
 	lv_obj_align(label_btn, NULL, LV_ALIGN_CENTER, 0, -28);
 	label_btn2 = lv_label_create(btn_payloads, label_btn2);
-	s_printf(btn_colored_text, "%s%s", text_color, " Payloads#");
+	s_printf(btn_colored_text, "%s%s", text_color, " 载荷#");
 	lv_label_set_text(label_btn2, btn_colored_text);
 	lv_obj_set_pos(btn_payloads, 632, 160);
 	lv_obj_align(label_btn2, NULL, LV_ALIGN_IN_TOP_MID, 0, 174);
