@@ -6,6 +6,8 @@ name: 中文版自动构建
 #   3. 打 tag(zh-*):直接构建该 tag 并发布
 #
 # 上游合并冲突时会自动开 issue 提醒,不会强行覆盖汉化改动。
+# 开 issue 还要求仓库启用 Issues。下面的 issues: write 只给 token 授权,
+# 打不开这个开关(fork 默认关闭 Issues,权限已经给了也会创建失败)。
 
 on:
   schedule:

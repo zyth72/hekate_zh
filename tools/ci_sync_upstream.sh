@@ -5,6 +5,7 @@
 #   * 默认合并上游最新的 v* 标签(稳定版);UPSTREAM_REF 可以指定别的引用,如 master
 #   * 已经包含该引用时不会重复合并
 #   * 合并冲突:中止合并;在 CI 里(GH_TOKEN 可用)自动开 issue 提醒手动处理,并以非 0 退出
+#     仓库必须启用 Issues。workflow 的 issues: write 不够,fork 默认是关闭的
 #
 # 输出(CI 里写入 $GITHUB_OUTPUT,本地运行时打印到 stdout):
 #   changed=true|false   相对上一次发布是否有变化(决定要不要重新构建/发布)
@@ -83,11 +84,23 @@ else
 		warn "上游更新与汉化改动冲突,已中止合并:"
 		echo "$conflicts"
 		if [ -n "${GH_TOKEN:-}" ] && [ "$DRY_RUN" != "true" ]; then
-			gh issue create \
+			# 不要吞掉 gh 的报错。workflow 已经写了 issues: write 时,
+			# 失败通常是仓库关闭了 Issues(fork 默认关闭),token 权限打不开这个开关。
+			if ! issue_err=$(gh issue create \
 				--title "上游 ${target} 需要手动合并($(date +%F))" \
 				--body "$(printf '自动合并上游 %s 时发生冲突,已中止合并,未改动任何分支。\n\n冲突文件:\n```\n%s\n```\n\n本地处理方式:\n```bash\ngit fetch upstream --tags\ngit merge %s\n# 手动解决冲突后\ngit push origin master\n```\n\n也可以在上游合并完成后,手动触发一次 workflow_dispatch 重新构建发布。' \
-					"$target" "$conflicts" "$target")" 2>/dev/null \
-				|| warn "创建 issue 失败(检查 workflow 的 issues 权限)"
+					"$target" "$conflicts" "$target")" 2>&1); then
+				warn "创建 issue 失败:"
+				printf '%s\n' "$issue_err"
+				case "$issue_err" in
+					*"disabled issues"*|*"Issues are disabled"*)
+						warn "仓库已关闭 Issues。issues: write 只授权 token,不能打开这个开关;请到仓库 Settings → General → Features 启用 Issues。"
+						;;
+					*)
+						warn "若运行日志里的 GITHUB_TOKEN Permissions 没有 Issues: write,再检查 workflow 的 permissions。"
+						;;
+				esac
+			fi
 		fi
 		exit 1
 	fi
